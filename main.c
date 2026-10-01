@@ -79,3 +79,34 @@ int main(void)
      construction et chaque liberation) et on cherche l'etape ou il monte
      sans jamais redescendre : la fuite est la, on resserre jusqu'a la
      trouver (recherche par dichotomie). */
+
+/* Exercice 7 - valgrind sur la meme fuite (valgrind --leak-check=full ./demo)
+   Sans la fuite, deux dernieres lignes du rapport :
+     For lists of detected and suppressed errors, rerun with: -s
+     ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+   Avec la fuite :
+     48 (16 direct, 32 indirect) bytes in 1 blocks are definitely lost
+        at 0x4846828: malloc (in .../vgpreload_memcheck-amd64-linux.so)
+        by 0x109351: suivi_malloc (liste.c:11)
+        by 0x1093D3: liste_inserer (liste.c:28)
+        by 0x109251: main (main.c:9)
+                          Sans la fuite              Avec la fuite
+     definitely lost      0                          16 octets en 1 bloc
+     indirectly lost      0                          32 octets en 2 blocs
+     total heap usage     6 allocs, 6 frees          9 allocs, 6 frees
+     Votre compteur       0                          3
+
+   Question A : main.c:9, la ligne qui construit la seconde liste
+     (fuite = liste_inserer(fuite, i)). Ce n'est pas la ligne du free oublie :
+     valgrind montre ou le bloc a ete ALLOUE, pas ou il aurait du etre
+     libere. Le free manquant est liste_liberer(fuite), qui devait figurer a
+     cote de liste_liberer(liste), avant le return.
+   Question B : 1 bloc definitely lost et 2 indirectly lost. Plus aucun
+     pointeur ne mene a la tete (3) : elle est perdue directement. Les
+     maillons 2 et 1 ne sont accessibles que par le champ suivant de la tete
+     perdue : ils sont perdus indirectement. Liberer la tete correctement
+     (avec liste_liberer) aurait tout rendu.
+   Question C : N = 9 et M = 6 (sans fuite : 6 et 6). On a cree 8 maillons
+     (5 + 3), pas 9 : l'allocation en plus est le tampon de 4096 octets que
+     printf reserve pour stdout (d'ou 4,224 = 8*16 + 4096 octets). Les
+     6 free = 5 maillons de la premiere liste + ce tampon. */
