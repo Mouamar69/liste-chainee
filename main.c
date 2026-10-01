@@ -10,9 +10,11 @@ int main(void)
     liste_afficher(liste);
     printf("longueur  : %d\n", liste_longueur(liste));
     printf("contient 30 : %s\n", liste_contient(liste, 30) ? "oui" : "non");
+    printf("blocs apres construction : %d\n", liste_blocs_en_circulation());
 
     liste_liberer(liste);
     printf("liberee\n");
+    printf("blocs apres liberation   : %d\n", liste_blocs_en_circulation());
     return 0;
 }
 
@@ -52,3 +54,28 @@ int main(void)
    Question 3 : des qu'un .h en inclut un autre. Par exemple un pile.h qui
      fait #include "liste.h" : un main.c qui inclut pile.h et liste.h recoit
      liste.h deux fois, sans l'avoir ecrit deux fois. La garde le protege. */
+
+/* Exercice 6 - Trouver une fuite sans aucun outil
+   Fuite introduite : une seconde liste de 3 elements, jamais liberee
+     Maillon *fuite = NULL;
+     for (int i = 1; i <= 3; i++) fuite = liste_inserer(fuite, i);
+                                  Sans la fuite   Avec la fuite
+     Compteur apres construction        5               8
+     Compteur apres liberation          0               3
+
+   Question A : ce sont des details internes du module. Static les rend
+     invisibles hors de liste.c : personne d'autre ne peut modifier blocs
+     (blocs = 0 depuis main.c fausserait le compte) ni appeler suivi_free sur
+     un bloc qui ne vient pas de suivi_malloc. On n'expose que la lecture,
+     liste_blocs_en_circulation. Et static evite les conflits de noms avec
+     une autre variable blocs ailleurs dans le projet.
+   Question B : sans le test dans suivi_malloc, un malloc rate (NULL)
+     compterait un bloc qui n'existe pas : le compteur annoncerait une fuite
+     inexistante. Sans le test dans suivi_free, free(NULL) (legal, ne fait
+     rien) decrementerait quand meme : le compteur pourrait masquer une vraie
+     fuite, voire devenir negatif. Dans les deux cas il ment.
+   Question C : non, il dit combien, pas ou. Avec ce seul outil, on affiche
+     le compteur a plusieurs endroits du programme (avant/apres chaque
+     construction et chaque liberation) et on cherche l'etape ou il monte
+     sans jamais redescendre : la fuite est la, on resserre jusqu'a la
+     trouver (recherche par dichotomie). */

@@ -13,6 +13,7 @@ int      liste_longueur(const Maillon *tete);
 bool     liste_contient(const Maillon *tete, int valeur);
 void     liste_afficher(const Maillon *tete);
 void     liste_liberer(Maillon *tete);
+int      liste_blocs_en_circulation(void);
 
 #endif /* LISTE_H */
 
