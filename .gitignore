@@ -1,6 +1,8 @@
 *.o
 demo
 demo.exe
+deborde
+deborde.exe
 
 # Exercice 0 - Pourquoi ne versionne-t-on jamais les .o ni l'executable ?
 # Ce sont des fichiers generes : on les recree a tout moment a partir des
