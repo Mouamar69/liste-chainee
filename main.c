@@ -12,6 +12,16 @@ int main(void)
     printf("contient 30 : %s\n", liste_contient(liste, 30) ? "oui" : "non");
     printf("blocs apres construction : %d\n", liste_blocs_en_circulation());
 
+    int max;
+    if (liste_maximum(liste, &max))
+        printf("maximum   : %d\n", max);
+    else
+        printf("maximum   : liste vide\n");
+    if (liste_maximum(NULL, &max))
+        printf("maximum de NULL : %d\n", max);
+    else
+        printf("maximum de NULL : liste vide\n");
+
     liste_liberer(liste);
     printf("liberee\n");
     printf("blocs apres liberation   : %d\n", liste_blocs_en_circulation());
@@ -110,3 +120,24 @@ int main(void)
      (5 + 3), pas 9 : l'allocation en plus est le tampon de 4096 octets que
      printf reserve pour stdout (d'ou 4,224 = 8*16 + 4096 octets). Les
      6 free = 5 maillons de la premiere liste + ce tampon. */
+
+/* Exercice 9 - Ajouter une fonction au module
+   Sortie du programme :
+     liste     : 50 -> 40 -> 30 -> 20 -> 10 -> NULL
+     longueur  : 5
+     contient 30 : oui
+     blocs apres construction : 5
+     maximum   : 50
+     maximum de NULL : liste vide
+     liberee
+     blocs apres liberation   : 0
+   valgrind --leak-check=full ./demo : aucune erreur, aucune fuite.
+
+   Question A : trois fichiers modifies : liste.h (declaration), liste.c
+     (definition) et main.c (appel). make a recompile main.c ET liste.c,
+     puis relie demo : les deux .o dependent de liste.h, qui a change.
+   Question B : -1 peut etre une vraie valeur de la liste : une liste qui
+     contient -5, -1 et -3 a pour maximum -1, et l'appelant ne pourrait pas
+     distinguer "le maximum vaut -1" de "la liste est vide". Aucune valeur
+     d'int n'est libre pour servir de signal. On separe donc les deux
+     informations : le bool dit s'il y a un resultat, *resultat le contient. */

@@ -14,6 +14,7 @@ bool     liste_contient(const Maillon *tete, int valeur);
 void     liste_afficher(const Maillon *tete);
 void     liste_liberer(Maillon *tete);
 int      liste_blocs_en_circulation(void);
+bool     liste_maximum(const Maillon *tete, int *resultat);
 
 #endif /* LISTE_H */
 
