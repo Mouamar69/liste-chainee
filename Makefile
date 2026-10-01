@@ -1,14 +1,15 @@
-demo: main.o liste.o
-	gcc -Wall -Wextra -std=c11 -g -o demo main.o liste.o
+CC     = gcc
+CFLAGS = -Wall -Wextra -std=c11 -g
+OBJ    = main.o liste.o
 
-main.o: main.c liste.h
-	gcc -Wall -Wextra -std=c11 -g -c main.c
+demo: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
-liste.o: liste.c liste.h
-	gcc -Wall -Wextra -std=c11 -g -c liste.c
+%.o: %.c liste.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f main.o liste.o demo
+	rm -f $(OBJ) demo
 
 .PHONY: clean
 
@@ -28,3 +29,23 @@ clean:
 #   Makefile:2: *** missing separator.  Stop.
 #   make exige une tabulation en debut de ligne de commande ; avec des
 #   espaces, il ne reconnait pas la ligne comme une commande.
+
+# Exercice 5 - La dependance au fichier d'en-tete
+# Etape 2, avec la dependance (main.o: main.c liste.h), touch liste.h :
+#   main.c ET liste.c sont recompiles, puis demo est relie.
+# Etape 4, sans la dependance (main.o: main.c), touch liste.h :
+#   seul liste.c est recompile, puis demo est relie. main.o n'est PAS refait.
+#
+# Question A : sans la dependance, make ne sait plus que main.o depend de
+#   liste.h : quand liste.h change, il garde l'ancien main.o. Seul liste.o
+#   est mis a jour.
+# Question B : un executable incoherent. liste.o est compile avec la nouvelle
+#   structure Maillon (plus grande, champs decales) mais main.o avec
+#   l'ancienne : les deux moities ne sont pas d'accord sur la taille et la
+#   disposition d'un Maillon. Aucune erreur a la compilation ni au lien, mais
+#   un comportement indefini a l'execution (valeurs fausses, plantage).
+#   Seul un make clean && make le corrige.
+#
+# Makefile final : $@ = la cible, $^ = toutes les dependances, $< = la
+#   premiere dependance. La regle %.o: %.c liste.h vaut pour tous les .o et
+#   garde la dependance a liste.h.
