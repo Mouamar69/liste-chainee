@@ -18,11 +18,7 @@ bool     liste_maximum(const Maillon *tete, int *resultat);
 
 #endif /* LISTE_H */
 
-/* Question A : main.c manipule des Maillon (Maillon *liste = NULL) et le
-     compilateur doit connaitre le type pour compiler les prototypes. Or
-     main.c n'inclut que liste.h, jamais liste.c : un type defini dans
-     liste.c serait invisible depuis main.c, d'ou "unknown type name".
-   Question B : pour que le compilateur verifie que les definitions de
-     liste.c correspondent exactement aux declarations promises dans
-     liste.h (sinon une difference de parametres passerait inapercue), et
-     parce que liste.c a lui aussi besoin du type Maillon. */
+/* Question A : main.c utilise Maillon, mais il ne voit que liste.h.
+     Si le type etait dans liste.c, main.c ne le connaitrait pas.
+   Question B : liste.c a besoin du type Maillon, et le compilateur
+     verifie que les fonctions du .c sont identiques a celles du .h. */
